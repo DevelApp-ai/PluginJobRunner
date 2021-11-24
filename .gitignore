@@ -1,0 +1,6 @@
+bin
+obj
+/.vs
+/WebApi/log
+*.user
+/JobRunner/log
