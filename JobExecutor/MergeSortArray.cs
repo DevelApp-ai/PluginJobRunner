@@ -42,6 +42,7 @@ namespace JobExecutor
 
         public (bool success, string returnedJobData, string error) ExecuteJob(IJobExecutionContext jobExecutionContext, string jobData)
         {
+            //TODO replace jobData string with an object to avoid the need for verification here except for correct format
             if (string.IsNullOrWhiteSpace(jobData))
             {
                 return (success: false, returnedJobData: null, error: "Missing jobData");
