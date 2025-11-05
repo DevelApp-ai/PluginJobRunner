@@ -102,6 +102,13 @@ namespace JobRunner.JobExecutionFactory
                 throw new ObjectDisposedException(nameof(JobExecutorFactory));
             }
 
+            // Handle null or empty input
+            if (string.IsNullOrWhiteSpace(jobRunnerFullName))
+            {
+                Log.Warning("JobExecutor name is null or empty");
+                return null;
+            }
+
             string[] jobRunnerNamePart = jobRunnerFullName.Split('.');
             IJobExecutor jobExecutor = null;
             if (jobRunnerNamePart.Length >= 2)

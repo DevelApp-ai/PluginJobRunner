@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JobExecutor\JobExecutor.csproj" />
+    <ProjectReference Include="..\JobRunner\JobRunner.csproj" />
   </ItemGroup>
 
 </Project>
