@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace JobRunner.Exceptions
 {
-    [Serializable]
     internal class JobRunnerException : Exception
     {
         public JobRunnerException()
@@ -15,10 +13,6 @@ namespace JobRunner.Exceptions
         }
 
         public JobRunnerException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected JobRunnerException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

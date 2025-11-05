@@ -1,4 +1,5 @@
 ﻿using DevelApp.RuntimePluggableClassFactory;
+using DevelApp.RuntimePluggableClassFactory.FilePlugin;
 using DevelApp.Utility.Model;
 using JobRunner.Exceptions;
 using PluginInterface;
@@ -16,15 +17,14 @@ namespace JobRunner.JobExecutionFactory
     public class JobExecutorFactory
     {
         private PluginClassFactory<IJobExecutor> _jobExecutorFactory;
+        private FilePluginLoader<IJobExecutor> _pluginLoader;
 
         public JobExecutorFactory(Uri pluginPathUri)
         {
-            //Support only the latest version of the plugin
-            int retainOldVersions = 0;
             try
             {
-                _jobExecutorFactory = new PluginClassFactory<IJobExecutor>(retainOldVersions);
-                _jobExecutorFactory.LoadFromDirectory(pluginPathUri);
+                _pluginLoader = new FilePluginLoader<IJobExecutor>(pluginPathUri);
+                _jobExecutorFactory = new PluginClassFactory<IJobExecutor>(_pluginLoader);
             }
             catch (Exception ex)
             {
