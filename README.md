@@ -46,10 +46,10 @@ Migrations are done with ```dotnet ef database update -s ../JobRunner``` in the 
 * WebApi and JobRunner writes out unneeded headers "server: Microsoft-IIS/10.0", "x-firefox-spdy: h2", "x-powered-by: ASP.NET" which should be limited to development or removed all together
 * jobData and returnedJobData in IJobExecutor is a string instead of inforced as Json. Is JsonValue from Manatee.Json useful ?
 * IJobExecutionContext only exists because of mocking framework used for testing does not support shims so mocking framework should be changed
-* RuntimePluggableClassFactory has two important implementation limitations (for my use it is defects): 
-  - All dlls in the plugin library and their dependencies are loaded into memory and not filtered on which are approved
-  - Plugin library is only loaded at startup so the application needs to be restarted to add or remove functionality
-* Failing JobExecutor should not be killing the whole application. Stability should be investigated more
+* ~~RuntimePluggableClassFactory has two important implementation limitations (for my use it is defects):~~ **RESOLVED in v2.1.0**
+  - ~~All dlls in the plugin library and their dependencies are loaded into memory and not filtered on which are approved~~ **RESOLVED**: Now uses IPluginSecurityValidator with multi-level validation
+  - ~~Plugin library is only loaded at startup so the application needs to be restarted to add or remove functionality~~ **RESOLVED**: v2.0.0 added UnloadPlugin(), UnloadAllPlugins(), and PluginWatcher for hot-swapping
+* ~~Failing JobExecutor should not be killing the whole application. Stability should be investigated more~~ **RESOLVED**: JobExecutorFactory now uses error event handlers (PluginLoadingFailed, SecurityValidationFailed, PluginInstantiationFailed) for graceful degradation without crashes
 * More consistent naming
 * IJobExecutionContext is not implemented and is only a stub
 * ApiKey security in own Nuget as used often eventhough it is fairly simple code 
