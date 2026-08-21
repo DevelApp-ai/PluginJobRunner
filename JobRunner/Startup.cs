@@ -19,6 +19,7 @@ using System.Text.Json.Serialization;
 using JobRunner.ApiSecurity;
 using System.IO;
 using Quartz;
+using JobRunner.HealthChecks;
 using Quartz.Impl;
 using Quartz.Spi;
 using JobRunner.Quartz;
@@ -84,6 +85,15 @@ namespace JobRunner
             services.AddSingleton(new JobSchedule(
                 jobType: typeof(HelloWorldJob),
                 cronExpression: "0/5 * * * * ?")); // run every 5 seconds
+
+            #region Health Checks
+
+            services.AddHealthChecks()
+                .AddDbContextCheck<JobDbContext>("Database")
+                .AddCheck<DatabaseHealthCheck>("Database Extended")
+                .AddCheck<QuartzHealthCheck>("Quartz Scheduler");
+
+            #endregion
             // Debug end
 
             services.AddHostedService<QuartzHostedService>();
@@ -129,6 +139,7 @@ namespace JobRunner
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }

@@ -51,7 +51,7 @@ namespace JobRunner.Controllers
             {
                 return BadRequest();
             }
-            //TODO verify jobexecutor exists
+            // JobExecutor validation should be implemented via plugin factory
 
             _context.Entry(job).State = EntityState.Modified;
 
@@ -80,7 +80,7 @@ namespace JobRunner.Controllers
         public async Task<ActionResult<Job>> PostJob([FromBody] PostJobRequest postJobRequest)
         {
             Job job = new Job();
-            //TODO verify jobexecutor exists
+            // JobExecutor validation should be implemented via plugin factory
             job.JobExecutor = postJobRequest.JobExecutor;
             job.JobData = postJobRequest.JobData;
 
