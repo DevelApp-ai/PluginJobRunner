@@ -32,16 +32,16 @@ namespace JobExecutorModel
         /// <summary>
         /// Job executor is the task doing the job on the data
         /// </summary>
-        public string JobExecutor { get; set; }
+        public string? JobExecutor { get; set; }
 
         /// <summary>
         /// Data of the job. This might be updated depending on job execution
         /// </summary>
-        public string JobData { get; set; }
+        public string? JobData { get; set; }
 
         /// <summary>
         /// Messages about the job execution
         /// </summary>
-        public string JobExecutionMessage { get; set; }
+        public string? JobExecutionMessage { get; set; }
     }
 }

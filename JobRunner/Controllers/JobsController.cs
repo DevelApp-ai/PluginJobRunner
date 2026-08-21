@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JobExecutorModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
@@ -76,6 +77,7 @@ namespace JobRunner.Controllers
 
         // POST: api/Jobs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [CustomizeValidator(RuleSet = "Default")]
         [HttpPost]
         public async Task<ActionResult<Job>> PostJob([FromBody] PostJobRequest postJobRequest)
         {

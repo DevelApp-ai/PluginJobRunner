@@ -20,6 +20,7 @@ using JobRunner.ApiSecurity;
 using System.IO;
 using Quartz;
 using JobRunner.HealthChecks;
+using JobRunner.Validation;
 using Quartz.Impl;
 using Quartz.Spi;
 using JobRunner.Quartz;
@@ -40,6 +41,7 @@ namespace JobRunner
         {
             services.AddHttpContextAccessor();
             services.AddControllers().AddJsonOptions(options =>
+            services.AddValidatorsFromAssemblyContaining<PostJobRequestValidator>();
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;

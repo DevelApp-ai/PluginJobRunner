@@ -24,7 +24,7 @@ namespace JobExecutor
             }
         }
 
-        public string Description
+        public string? Description
         {
             get
             {
@@ -40,7 +40,7 @@ namespace JobExecutor
             }
         }
 
-        public (bool success, string returnedJobData, string error) ExecuteJob(IJobExecutionContext jobExecutionContext, string jobData)
+        public (bool success, string? returnedJobData, string? error) ExecuteJob(IJobExecutionContext? jobExecutionContext, string? jobData)
         {
             // Input validation ensures jobData is a JSON array
             if (string.IsNullOrWhiteSpace(jobData))
