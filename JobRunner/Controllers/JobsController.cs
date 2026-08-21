@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using DevelApp.RuntimePluggableClassFactory;
 
 namespace JobRunner.Controllers
 {
@@ -17,9 +18,12 @@ namespace JobRunner.Controllers
     {
         private readonly JobDbContext _context;
 
-        public JobsController(JobDbContext context)
+        private readonly PluginClassFactory<IJobExecutor>? _jobExecutorFactory;
+
+        public JobsController(JobDbContext context, PluginClassFactory<IJobExecutor>? jobExecutorFactory = null)
         {
             _context = context;
+            _jobExecutorFactory = jobExecutorFactory;
         }
 
         // GET: api/Jobs
@@ -75,14 +79,20 @@ namespace JobRunner.Controllers
             return NoContent();
         }
 
-        // POST: api/Jobs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [CustomizeValidator(RuleSet = "Default")]
         [HttpPost]
         public async Task<ActionResult<Job>> PostJob([FromBody] PostJobRequest postJobRequest)
         {
+            if (_jobExecutorFactory != null)
+            {
+                var executorName = new IdentifierString(postJobRequest.JobExecutor);
+                var moduleName = new NamespaceString("JobExecutor");
+                
+                if (!_jobExecutorFactory.IsPluginAvailable(moduleName, executorName))
+                {
+                    return BadRequest($"Job executor {postJobRequest.JobExecutor} is not available");
+                }
+            }
             Job job = new Job();
-            // JobExecutor validation should be implemented via plugin factory
             job.JobExecutor = postJobRequest.JobExecutor;
             job.JobData = postJobRequest.JobData;
 

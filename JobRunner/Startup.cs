@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using DevelApp.RuntimePluggableClassFactory;
 using DevelApp.RuntimePluggableClassFactory.FilePlugin;
 using DevelApp.RuntimePluggableClassFactory.Security;
+using PluginInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,7 @@ using System.IO;
 using DevelApp.RuntimePluggableClassFactory;
 using DevelApp.RuntimePluggableClassFactory.FilePlugin;
 using DevelApp.RuntimePluggableClassFactory.Security;
+using PluginInterface;
 using Quartz;
 using JobRunner.HealthChecks;
 using JobRunner.Validation;
@@ -96,6 +98,9 @@ namespace JobRunner
             services.AddSingleton<IPluginLoader<IJobExecutor>>(new FilePluginLoader<IJobExecutor>(
                 new Uri(pluginDirectory), securityValidator));
             services.AddSingleton<PluginClassFactory<IJobExecutor>>();
+
+            // Also register typed plugin factory for type-safe job executors
+            services.AddSingleton<DevelApp.RuntimePluggableClassFactory.TypedPluginClassFactory<IJobExecutor<MergeSortInput, MergeSortOutput>, MergeSortInput, MergeSortOutput>>();
 
             #endregion
 
