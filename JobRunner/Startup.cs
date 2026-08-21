@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using DevelApp.RuntimePluggableClassFactory;
 using DevelApp.RuntimePluggableClassFactory.FilePlugin;
@@ -23,10 +26,6 @@ using Microsoft.Data.SqlClient;
 using System.Text.Json.Serialization;
 using JobRunner.ApiSecurity;
 using System.IO;
-using DevelApp.RuntimePluggableClassFactory;
-using DevelApp.RuntimePluggableClassFactory.FilePlugin;
-using DevelApp.RuntimePluggableClassFactory.Security;
-using PluginInterface;
 using Quartz;
 using JobRunner.HealthChecks;
 using JobRunner.Validation;
@@ -34,6 +33,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Quartz.Impl;
 using Quartz.Spi;
 using JobRunner.Quartz;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace JobRunner
 {
@@ -50,13 +50,31 @@ namespace JobRunner
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            
+            // Add API versioning
+            services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+                options.ApiVersionReader = ApiVersionReader.Combine(
+                    new QueryStringApiVersionReader("api-version"),
+                    new HeaderApiVersionReader("X-API-Version"));
+            });
+            
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
+            
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
             services.AddValidatorsFromAssemblyContaining<PostJobRequestValidator>();
-            
+
             #region Rate Limiting
 
             services.AddRateLimiter(options =>
@@ -108,7 +126,8 @@ namespace JobRunner
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "JobRunner", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "JobRunner API", Version = "v1" });
+                c.SwaggerDoc("v2", new OpenApiInfo { Title = "JobRunner API", Version = "v2" });
 
                 var filePath = Path.Combine(System.AppContext.BaseDirectory, "JobRunner.xml");
                 c.IncludeXmlComments(filePath);
@@ -122,6 +141,9 @@ namespace JobRunner
                         Type = SecuritySchemeType.ApiKey
                     });
                 c.OperationFilter<ApiKeyRequirementsOperationFilter>();
+                
+                // Add API versioning support
+                c.OperationFilter<SwaggerDefaultValues>();
             });
 
             #endregion
@@ -161,7 +183,7 @@ namespace JobRunner
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, JobDbContext jobContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, JobDbContext jobContext, IApiVersionDescriptionProvider provider)
         {
             if (env.IsDevelopment())
             {
@@ -178,14 +200,20 @@ namespace JobRunner
 
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "JobRunner v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", 
+                            $"JobRunner API {description.GroupName}");
+                    }
+                });
             }
             else
             {
                 // In test and prod the DevOps pipeline should handle migration
                 jobContext.Database.CanConnect();
             }
-
 
             app.UseHttpsRedirection();
 
@@ -200,6 +228,38 @@ namespace JobRunner
             {
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
+            });
+        }
+    }
+
+    /// <summary>
+    /// Operation filter to add API version information to Swagger
+    /// </summary>
+    public class SwaggerDefaultValues : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            var apiDescription = context.ApiDescription;
+
+            operation.Deprecated |= apiDescription.IsDeprecated();
+
+            foreach (var responseType in apiDescription.SupportedResponseTypes)
+            {
+                operation.Responses.TryAdd(responseType.StatusCode.ToString(), 
+                    new OpenApiResponse { Description = responseType.ApiResponseFormatter?.Description });
+            }
+
+            if (operation.Parameters == null)
+                operation.Parameters = new List<OpenApiParameter>();
+
+            // Add API version parameter
+            operation.Parameters.Add(new OpenApiParameter
+            {
+                Name = "api-version",
+                In = ParameterLocation.Query,
+                Description = "API version",
+                Required = false,
+                Schema = new OpenApiSchema { Type = "string" }
             });
         }
     }

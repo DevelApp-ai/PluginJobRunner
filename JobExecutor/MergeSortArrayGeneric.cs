@@ -2,55 +2,42 @@ using DevelApp.Utility.Model;
 using PluginInterface;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace JobExecutor
 {
     /// <summary>
-    /// Type-safe implementation of merge sort job executor
-    /// Implements IJobExecutor<TInput, TOutput> for strongly-typed job execution
+    /// Type-safe implementation of merge sort array job executor
+    /// Implements IJobExecutor<TInput, TOutput> for better type safety
     /// </summary>
     public class MergeSortArrayGeneric : IJobExecutor<MergeSortInput, MergeSortOutput>
     {
-        public IdentifierString Name
-        {
-            get
-            {
-                return "MergeSortGeneric";
-            }
-        }
+        /// <summary>
+        /// Plugin name
+        /// </summary>
+        public IdentifierString Name => new IdentifierString("MergeSortGeneric");
 
-        public NamespaceString Module
-        {
-            get
-            {
-                return "SortArray";
-            }
-        }
+        /// <summary>
+        /// Plugin module
+        /// </summary>
+        public NamespaceString Module => new NamespaceString("SortArray");
 
-        public string? Description
-        {
-            get
-            {
-                return "Type-safe sorting of an integer array using merge sort algorithm";
-            }
-        }
+        /// <summary>
+        /// Plugin description
+        /// </summary>
+        public string? Description => "Sorts an array of integers using merge sort algorithm with type-safe input/output";
 
-        public SemanticVersionNumber Version
-        {
-            get
-            {
-                return "1.0.0";
-            }
-        }
+        /// <summary>
+        /// Plugin version
+        /// </summary>
+        public SemanticVersionNumber Version => SemanticVersionNumber.Parse("1.0.0");
 
         /// <summary>
         /// Executes the merge sort job with type-safe input and output
         /// </summary>
         /// <param name="context">Execution context</param>
-        /// <param name="input">Input data containing array to sort</param>
+        /// <param name="input">Merge sort input containing array to sort</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Job execution result with sorted array</returns>
         public async Task<JobExecutionResult<MergeSortOutput>> ExecuteAsync(
@@ -59,7 +46,7 @@ namespace JobExecutor
             CancellationToken cancellationToken = default)
         {
             var stopwatch = Stopwatch.StartNew();
-            
+
             try
             {
                 // Validate input
@@ -71,32 +58,43 @@ namespace JobExecutor
                         stopwatch.Elapsed);
                 }
 
-                // Make a copy to avoid modifying the original
-                var arrayCopy = new int[input.Values.Length];
-                Array.Copy(input.Values, arrayCopy, input.Values.Length);
+                // Make a copy of the array to sort (avoid modifying input)
+                int[] arrayToSort = new int[input.Values.Length];
+                Array.Copy(input.Values, arrayToSort, input.Values.Length);
 
                 // Sort the array
-                Sort(ref arrayCopy, 0, arrayCopy.Length - 1);
+                await Task.Run(() => Sort(ref arrayToSort, 0, arrayToSort.Length - 1), cancellationToken);
+
+                // Check for cancellation
+                cancellationToken.ThrowIfCancellationRequested();
 
                 // Create output
                 var output = new MergeSortOutput
                 {
-                    SortedValues = arrayCopy,
+                    SortedValues = arrayToSort,
                     OriginalLength = input.Values.Length,
                     Algorithm = "MergeSort"
                 };
 
-                return JobExecutionResult<MergeSortOutput>.CreateSuccess(
-                    output,
+                return JobExecutionResult<MergeSortOutput>.CreateSuccess(output, stopwatch.Elapsed);
+            }
+            catch (OperationCanceledException)
+            {
+                return JobExecutionResult<MergeSortOutput>.CreateFailure(
+                    "Execution was cancelled",
+                    null,
                     stopwatch.Elapsed);
             }
             catch (Exception ex)
             {
-                context?.Logger?.LogError(ex, "Merge sort failed");
                 return JobExecutionResult<MergeSortOutput>.CreateFailure(
                     $"Sorting algorithm failed: {ex.Message}",
                     ex,
                     stopwatch.Elapsed);
+            }
+            finally
+            {
+                stopwatch.Stop();
             }
         }
 
