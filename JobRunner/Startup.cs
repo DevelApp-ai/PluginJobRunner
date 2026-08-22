@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using DevelApp.RuntimePluggableClassFactory;
+using DevelApp.RuntimePluggableClassFactory.FilePlugin;
+using DevelApp.RuntimePluggableClassFactory.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +22,13 @@ using Microsoft.Data.SqlClient;
 using System.Text.Json.Serialization;
 using JobRunner.ApiSecurity;
 using System.IO;
+using DevelApp.RuntimePluggableClassFactory;
+using DevelApp.RuntimePluggableClassFactory.FilePlugin;
+using DevelApp.RuntimePluggableClassFactory.Security;
 using Quartz;
+using JobRunner.HealthChecks;
+using JobRunner.Validation;
+using Microsoft.AspNetCore.RateLimiting;
 using Quartz.Impl;
 using Quartz.Spi;
 using JobRunner.Quartz;
@@ -43,6 +53,51 @@ namespace JobRunner
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
+            services.AddValidatorsFromAssemblyContaining<PostJobRequestValidator>();
+            
+            #region Rate Limiting
+
+            services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddFixedWindowLimiter("api", opt =>
+                {
+                    opt.PermitLimit = 100;
+                    opt.Window = TimeSpan.FromMinutes(1);
+                });
+            });
+
+            #endregion
+
+            #region Plugin Integration
+
+            // Configure plugin directory from configuration or environment
+            var pluginDirectory = Configuration.GetValue<string>("PluginDirectory") 
+                ?? Environment.GetEnvironmentVariable("JOBRUNNER_PLUGIN_DIRECTORY")
+                ?? Path.Combine(Directory.GetCurrentDirectory(), "Plugins");
+
+            // Ensure plugin directory exists
+            if (!Directory.Exists(pluginDirectory))
+            {
+                Directory.CreateDirectory(pluginDirectory);
+            }
+
+            // Setup plugin security validator
+            var securitySettings = new PluginSecuritySettings
+            {
+                RequireDigitalSignature = false, // Can be configured
+                MaxAssemblySizeBytes = 10 * 1024 * 1024, // 10MB
+                AllowedExtensions = new List<string> { ".dll" }
+            };
+            var securityValidator = new DefaultPluginSecurityValidator(securitySettings);
+
+            // Setup plugin loader
+            services.AddSingleton<IPluginSecurityValidator>(securityValidator);
+            services.AddSingleton<IPluginLoader<IJobExecutor>>(new FilePluginLoader<IJobExecutor>(
+                new Uri(pluginDirectory), securityValidator));
+            services.AddSingleton<PluginClassFactory<IJobExecutor>>();
+
+            #endregion
 
             #region Swagger
 
@@ -84,6 +139,15 @@ namespace JobRunner
             services.AddSingleton(new JobSchedule(
                 jobType: typeof(HelloWorldJob),
                 cronExpression: "0/5 * * * * ?")); // run every 5 seconds
+
+            #region Health Checks
+
+            services.AddHealthChecks()
+                .AddDbContextCheck<JobDbContext>("Database")
+                .AddCheck<DatabaseHealthCheck>("Database Extended")
+                .AddCheck<QuartzHealthCheck>("Quartz Scheduler");
+
+            #endregion
             // Debug end
 
             services.AddHostedService<QuartzHostedService>();
@@ -125,10 +189,12 @@ namespace JobRunner
             app.UseAuthorization();
 
             app.UseMiddleware<ApiKeyMiddleware>();
+            app.UseRateLimiter();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }

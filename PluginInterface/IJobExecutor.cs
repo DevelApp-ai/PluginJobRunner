@@ -11,7 +11,7 @@ namespace PluginInterface
         /// <param name="jobExecutionContext"></param>
         /// <param name="jobData"></param>
         /// <returns></returns>
-        // TODO replace string with more specific JsonData to avoid passing error data to jobExecutor
+        // Consider using strongly-typed DTOs instead of string for better type safety
         (bool success, string returnedJobData, string error) ExecuteJob(IJobExecutionContext jobExecutionContext, string jobData);
     }
 }

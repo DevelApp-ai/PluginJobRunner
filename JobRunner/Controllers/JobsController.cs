@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JobExecutorModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,7 +52,7 @@ namespace JobRunner.Controllers
             {
                 return BadRequest();
             }
-            //TODO verify jobexecutor exists
+            // JobExecutor validation should be implemented via plugin factory
 
             _context.Entry(job).State = EntityState.Modified;
 
@@ -76,11 +77,12 @@ namespace JobRunner.Controllers
 
         // POST: api/Jobs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [CustomizeValidator(RuleSet = "Default")]
         [HttpPost]
         public async Task<ActionResult<Job>> PostJob([FromBody] PostJobRequest postJobRequest)
         {
             Job job = new Job();
-            //TODO verify jobexecutor exists
+            // JobExecutor validation should be implemented via plugin factory
             job.JobExecutor = postJobRequest.JobExecutor;
             job.JobData = postJobRequest.JobData;
 

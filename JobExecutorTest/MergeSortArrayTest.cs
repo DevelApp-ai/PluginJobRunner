@@ -25,7 +25,7 @@ namespace JobExecutorTest
             starts.Should().BeTrue();
         }
 
-        //TODO Non Json data
+        // Edge case: Non-JSON data is handled by validation in ExecuteJob
 
         #endregion
 

@@ -21,6 +21,6 @@ namespace JobRunner.Quartz
         /// <summary>
         /// Cron string expression
         /// </summary>
-        public string CronExpression { get; }
+        public string? CronExpression { get; }
     }
 }
