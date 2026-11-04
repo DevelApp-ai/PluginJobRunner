@@ -402,7 +402,7 @@ namespace JobRunner.Errors
 
         public override string ToString()
         {
-            return $[{(int)Code} {Code}: {Message}];
+            return $"[{(int)Code} {Code}: {Message}]";
         }
     }
 
