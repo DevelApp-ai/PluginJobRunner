@@ -9,7 +9,11 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -20,10 +24,32 @@ jobs:
         dotnet-version: '9.0.x'
         
     - name: Restore dependencies
-      run: dotnet restore
+      run: set -o pipefail; dotnet restore 2>&1 | tee restore.log
       
     - name: Build solution
-      run: dotnet build --no-restore --configuration Release
+      run: set -o pipefail; dotnet build --no-restore --configuration Release 2>&1 | tee build.log
       
     - name: Run tests
-      run: dotnet test --no-build --configuration Release --verbosity normal
+      run: set -o pipefail; dotnet test --no-build --configuration Release --verbosity normal 2>&1 | tee test.log
+
+    - name: Report failure details to PR
+      if: failure() && github.event_name == 'pull_request'
+      uses: actions/github-script@v8
+      with:
+        script: |
+          let body = 'build-and-test failed. Step results:';
+          try {
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({ owner: context.repo.owner, repo: context.repo.repo, run_id: context.runId });
+            const job = (jobs.data.jobs || []).find(function (j) { return j.name === 'build-and-test' || j.name.indexOf('build-and-test (') === 0; }) || jobs.data.jobs[0];
+            if (job) { for (const step of job.steps || []) { body += '\n- ' + step.name + ': **' + step.conclusion + '**'; } }
+          } catch (e) { body += '\nlistJobs error: ' + e; }
+          const fs = require('fs');
+          for (const lf of ['restore.log', 'build.log', 'test.log']) {
+            try {
+              const lines = fs.readFileSync(lf, 'utf8').trim().split('\n');
+              body += '\n<details><summary>' + lf + ' (tail)</summary>\n\n~~~\n' + lines.slice(-80).join('\n') + '\n~~~\n</details>';
+            } catch (e) { body += '\n(no ' + lf + ': ' + e + ')'; }
+          }
+          body += '\n_commit: ' + context.sha.slice(0, 8) + ' | run: ' + context.runId;
+          try { await core.summary.addRaw(body).write(); } catch (e) {}
+          await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: body });
