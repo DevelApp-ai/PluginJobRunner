@@ -52,7 +52,13 @@ jobs:
           const fs = require('fs');
           for (const lf of ['restore.log', 'build.log', 'test.log']) {
             try {
-              const lines = fs.readFileSync(lf, 'utf8').trim().split('\n');
+              let lines = fs.readFileSync(lf, 'utf8').trim().split('\n');
+              if (lf === 'build.log') {
+                // The build log is flooded with CS8632 nullable warnings; surface
+                // the actual compile errors so the PR report is actionable.
+                const errs = lines.filter(function (l) { return /: error |: fatal error|Build FAILED|error [A-Z]/.test(l); });
+                if (errs.length > 0) lines = errs;
+              }
               body += '\n<details><summary>' + lf + ' (tail)</summary>\n\n~~~\n' + lines.slice(-80).join('\n') + '\n~~~\n</details>';
             } catch (e) { body += '\n(no ' + lf + ': ' + e + ')'; }
           }
