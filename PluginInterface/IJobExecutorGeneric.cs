@@ -11,7 +11,7 @@ namespace PluginInterface
     /// </summary>
     /// <typeparam name="TInput">Type of input data for the job</typeparam>
     /// <typeparam name="TOutput">Type of output data from the job</typeparam>
-    public interface IJobExecutor<TInput, TOutput> : IPluginClass
+    public interface IJobExecutor<TInput, TOutput> : IPluginClass, ITypedPluginClass<TInput, TOutput>
     {
         /// <summary>
         /// Executes the job with strongly-typed input and output
@@ -23,6 +23,28 @@ namespace PluginInterface
             IJobExecutionContext? context,
             TInput input,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Default bridge to the ITypedPluginClass contract (required by
+        /// TypedPluginClassFactory&lt;TPlugin, TInput, TOutput&gt;). Implemented as a
+        /// default interface method so every existing IJobExecutor plugin satisfies
+        /// the typed contract without adding an Execute method per plugin.
+        /// </summary>
+        PluginExecutionResult<TOutput> ITypedPluginClass<TInput, TOutput>.Execute(
+            IPluginExecutionContext? context,
+            TInput input)
+        {
+            var result = ExecuteAsync(
+                null,
+                input,
+                context?.CancellationToken ?? CancellationToken.None).GetAwaiter().GetResult();
+
+            return result.Success
+                ? PluginExecutionResult<TOutput>.CreateSuccess(result.Data)
+                : PluginExecutionResult<TOutput>.CreateFailure(
+                    result.ErrorMessage ?? "Job execution failed",
+                    result.Exception);
+        }
     }
 
     /// <summary>

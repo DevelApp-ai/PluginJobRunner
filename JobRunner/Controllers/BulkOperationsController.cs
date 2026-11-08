@@ -1,3 +1,4 @@
+using DevelApp.RuntimePluggableClassFactory;
 using DevelApp.RuntimePluggableClassFactory.BulkOperations;
 using DevelApp.RuntimePluggableClassFactory.Interface;
 using DevelApp.RuntimePluggableClassFactory.SemanticVersioning;
