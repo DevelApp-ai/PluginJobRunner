@@ -459,7 +459,7 @@ namespace JobRunner.Controllers
                     Name = p.Name.ToString(),
                     Description = p.Description,
                     Versions = p.Versions.Select(v => v.ToString()).ToList(),
-                    NewestVersion = p.Versions.OrderByDescending().FirstOrDefault()?.ToString()
+                    NewestVersion = p.Versions.OrderByDescending(v => v).FirstOrDefault()?.ToString()
                 }).ToList();
 
                 return Ok(pluginInfos);

@@ -284,8 +284,7 @@ namespace JobRunner.Controllers
                         PluginName = kvp.Key.Name.ToString(),
                         Success = kvp.Value.Success,
                         Data = kvp.Value.Data,
-                        ErrorMessage = kvp.Value.ErrorMessage,
-                        ExecutionDuration = kvp.Value.ExecutionDuration
+                        ErrorMessage = kvp.Value.ErrorMessage
                     });
                 }
 
