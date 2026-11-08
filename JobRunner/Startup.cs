@@ -321,8 +321,13 @@ namespace JobRunner
 
             foreach (var responseType in apiDescription.SupportedResponseTypes)
             {
-                operation.Responses.TryAdd(responseType.StatusCode.ToString(), 
-                    new OpenApiResponse { Description = responseType.Description });
+                // ApiResponseType has no Description property; use a static,
+                // status-code derived description (standard versioning filter pattern).
+                var responseKey = responseType.IsDefaultResponse
+                    ? "default"
+                    : responseType.StatusCode.ToString();
+                operation.Responses.TryAdd(responseKey,
+                    new OpenApiResponse { Description = $"HTTP {responseKey}" });
             }
 
             if (operation.Parameters == null)
