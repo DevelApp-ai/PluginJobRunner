@@ -32,7 +32,8 @@ namespace JobRunner.HealthChecks
                     return HealthCheckResult.Unhealthy("Scheduler factory returned null");
                 }
                 
-                var isRunning = await scheduler.IsStarted(cancellationToken);
+                // IsStarted is a property on IScheduler, not a method
+                var isRunning = scheduler.IsStarted;
                 
                 if (!isRunning)
                 {

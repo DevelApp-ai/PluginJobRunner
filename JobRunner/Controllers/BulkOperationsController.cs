@@ -1,3 +1,4 @@
+using DevelApp.RuntimePluggableClassFactory;
 using DevelApp.RuntimePluggableClassFactory.BulkOperations;
 using DevelApp.RuntimePluggableClassFactory.Interface;
 using DevelApp.RuntimePluggableClassFactory.SemanticVersioning;
@@ -283,8 +284,7 @@ namespace JobRunner.Controllers
                         PluginName = kvp.Key.Name.ToString(),
                         Success = kvp.Value.Success,
                         Data = kvp.Value.Data,
-                        ErrorMessage = kvp.Value.ErrorMessage,
-                        ExecutionDuration = kvp.Value.ExecutionDuration
+                        ErrorMessage = kvp.Value.ErrorMessage
                     });
                 }
 
@@ -610,14 +610,4 @@ namespace JobRunner.Controllers
         public List<PluginInfo> Plugins { get; set; } = new List<PluginInfo>();
     }
 
-    /// <summary>
-    /// Plugin information
-    /// </summary>
-    public class PluginInfo
-    {
-        public string? Module { get; set; }
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public List<string>? Versions { get; set; }
-    }
 }

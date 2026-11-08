@@ -151,7 +151,7 @@ namespace JobRunner.Test
         public void JobError_IsRetryable_ReturnsCorrectValue(JobErrorCode code, bool expectedRetryable)
         {
             // Act
-            var isRetryable = JobError.IsRetryable(code);
+            var isRetryable = JobError.IsRetryableCode(code);
 
             // Assert
             Assert.Equal(expectedRetryable, isRetryable);
@@ -166,7 +166,7 @@ namespace JobRunner.Test
         public void JobError_IsTransient_ReturnsCorrectValue(JobErrorCode code, bool expectedTransient)
         {
             // Act
-            var isTransient = JobError.IsTransient(code);
+            var isTransient = JobError.IsTransientCode(code);
 
             // Assert
             Assert.Equal(expectedTransient, isTransient);

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using DevelApp.RuntimePluggableClassFactory;
 using DevelApp.RuntimePluggableClassFactory.Async;
+using DevelApp.RuntimePluggableClassFactory.Interface;
 using DevelApp.RuntimePluggableClassFactory.Caching;
 using DevelApp.RuntimePluggableClassFactory.FilePlugin;
 using DevelApp.RuntimePluggableClassFactory.Resilience;
@@ -29,6 +30,7 @@ using Serilog;
 using Microsoft.Data.SqlClient;
 using System.Text.Json.Serialization;
 using JobRunner.ApiSecurity;
+using FluentValidation;
 using System.IO;
 using Quartz;
 using JobRunner.HealthChecks;
@@ -110,9 +112,9 @@ namespace JobRunner
             var securitySettings = new PluginSecuritySettings
             {
                 RequireDigitalSignature = Configuration.GetValue<bool>("PluginSecurity:RequireDigitalSignature") || false,
-                MaxAssemblySizeBytes = Configuration.GetValue<int>("PluginSecurity:MaxAssemblySizeBytes") || (10 * 1024 * 1024),
-                AllowedExtensions = Configuration.GetValue<List<string>>("PluginSecurity:AllowedExtensions") 
-                    ?? new List<string> { ".dll" }
+                MaxAssemblySizeBytes = Configuration.GetValue("PluginSecurity:MaxAssemblySizeBytes", 10 * 1024 * 1024),
+                AllowedExtensions = Configuration.GetSection("PluginSecurity:AllowedExtensions").Get<HashSet<string>>() 
+                    ?? new HashSet<string> { ".dll" }
             };
             var securityValidator = new DefaultPluginSecurityValidator(securitySettings);
 
@@ -133,7 +135,8 @@ namespace JobRunner
             // ========================================================================
             
             var asyncPluginLoader = new AsyncPluginLoader<IJobExecutor>(filePluginLoader);
-            services.AddSingleton<IAsyncPluginLoader<IJobExecutor>>(asyncPluginLoader);
+            // RPCF 2.1.x ships no IAsyncPluginLoader interface; register the concrete async loader instead.
+            services.AddSingleton<AsyncPluginLoader<IJobExecutor>>(asyncPluginLoader);
 
             // Async factory - wraps the async loader
             services.AddSingleton<AsyncPluginClassFactory<IJobExecutor>>(provider =>
@@ -144,8 +147,8 @@ namespace JobRunner
             // ========================================================================
             
             var cacheSettings = Configuration.GetSection("PluginCache");
-            var poolSize = cacheSettings.GetValue<int>("PoolSize") || 10;
-            var enableCaching = cacheSettings.GetValue<bool>("EnableInstanceCaching") || true;
+            var poolSize = cacheSettings.GetValue("PoolSize", 10);
+            var enableCaching = cacheSettings.GetValue("EnableInstanceCaching", true);
             
             services.AddSingleton<CachedPluginClassFactory<IJobExecutor>>(provider =>
                 new CachedPluginClassFactory<IJobExecutor>(
@@ -161,17 +164,17 @@ namespace JobRunner
             var resilienceSettings = Configuration.GetSection("PluginResilience");
             var circuitBreakerOptions = new CircuitBreakerOptions
             {
-                FailureThreshold = resilienceSettings.GetValue<int>("CircuitBreaker:FailureThreshold") || 5,
-                ResetTimeout = TimeSpan.FromSeconds(resilienceSettings.GetValue<int>("CircuitBreaker:ResetTimeoutSeconds") || 30),
-                HalfOpenTestTimeout = TimeSpan.FromSeconds(resilienceSettings.GetValue<int>("CircuitBreaker:HalfOpenTestTimeoutSeconds") || 10)
+                FailureThreshold = resilienceSettings.GetValue("CircuitBreaker:FailureThreshold", 5),
+                ResetTimeout = TimeSpan.FromSeconds(resilienceSettings.GetValue("CircuitBreaker:ResetTimeoutSeconds", 30)),
+                HalfOpenTestTimeout = TimeSpan.FromSeconds(resilienceSettings.GetValue("CircuitBreaker:HalfOpenTestTimeoutSeconds", 10))
             };
             
             var retryPolicyOptions = new RetryPolicyOptions
             {
-                MaxRetries = resilienceSettings.GetValue<int>("RetryPolicy:MaxRetries") || 3,
-                InitialDelay = TimeSpan.FromMilliseconds(resilienceSettings.GetValue<int>("RetryPolicy:InitialDelayMs") || 100),
-                MaxDelay = TimeSpan.FromSeconds(resilienceSettings.GetValue<int>("RetryPolicy:MaxDelaySeconds") || 30),
-                BackoffMultiplier = resilienceSettings.GetValue<double>("RetryPolicy:BackoffMultiplier") || 2.0
+                MaxRetries = resilienceSettings.GetValue("RetryPolicy:MaxRetries", 3),
+                InitialDelay = TimeSpan.FromMilliseconds(resilienceSettings.GetValue("RetryPolicy:InitialDelayMs", 100)),
+                MaxDelay = TimeSpan.FromSeconds(resilienceSettings.GetValue("RetryPolicy:MaxDelaySeconds", 30)),
+                BackoffMultiplier = resilienceSettings.GetValue("RetryPolicy:BackoffMultiplier", 2.0)
             };
             
             services.AddSingleton<ResilientPluginClassFactory<IJobExecutor>>(provider =>
@@ -318,8 +321,13 @@ namespace JobRunner
 
             foreach (var responseType in apiDescription.SupportedResponseTypes)
             {
-                operation.Responses.TryAdd(responseType.StatusCode.ToString(), 
-                    new OpenApiResponse { Description = responseType.ApiResponseFormatter?.Description });
+                // ApiResponseType has no Description property; use a static,
+                // status-code derived description (standard versioning filter pattern).
+                var responseKey = responseType.IsDefaultResponse
+                    ? "default"
+                    : responseType.StatusCode.ToString();
+                operation.Responses.TryAdd(responseKey,
+                    new OpenApiResponse { Description = $"HTTP {responseKey}" });
             }
 
             if (operation.Parameters == null)

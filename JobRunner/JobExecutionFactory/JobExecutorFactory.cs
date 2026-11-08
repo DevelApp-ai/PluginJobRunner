@@ -3,6 +3,7 @@ using DevelApp.RuntimePluggableClassFactory.FilePlugin;
 using DevelApp.Utility.Model;
 using JobRunner.Exceptions;
 using PluginInterface;
+using System.IO;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,16 @@ namespace JobRunner.JobExecutionFactory
         {
             try
             {
+                // RPCF 2.1.x's FilePluginLoader no longer throws for a missing
+                // plugin directory (it tolerates it and simply loads nothing),
+                // which silently ignored misconfiguration. Fail fast instead,
+                // matching the documented constructor contract.
+                if (!Directory.Exists(pluginPathUri.LocalPath))
+                {
+                    throw new DirectoryNotFoundException(
+                        $"Plugin directory does not exist: {pluginPathUri.LocalPath}");
+                }
+
                 // Create plugin loader with default security validator (filters unsafe plugins)
                 _pluginLoader = new FilePluginLoader<IJobExecutor>(pluginPathUri);
                 
@@ -54,8 +65,8 @@ namespace JobRunner.JobExecutionFactory
         private void OnPluginLoadingFailed(object sender, PluginLoadingErrorEventArgs e)
         {
             Log.Warning(e.Exception, 
-                "Failed to load plugin from {FileName} in {PluginPath}. Plugin will be skipped. Error: {ErrorMessage}",
-                e.FileName, e.PluginPath, e.Exception.Message);
+                "Failed to load plugin {ModuleName}.{PluginName} version {Version}. Error: {ErrorMessage}",
+                e.ModuleName, e.PluginName, e.Version, e.Message ?? e.Exception?.Message);
         }
 
         /// <summary>
@@ -67,15 +78,15 @@ namespace JobRunner.JobExecutionFactory
             {
                 var issues = e.ValidationResult.Issues.Select(i => $"{i.Severity}: {i.Description}");
                 Log.Warning(
-                    "Security validation failed for plugin {FileName} in {PluginPath}. Risk Level: {RiskLevel}. Issues: {Issues}",
-                    e.FileName, e.PluginPath, e.ValidationResult.RiskLevel, string.Join(", ", issues));
+                    "Security validation failed for plugin {PluginPath} in folder {PluginFolder}. Risk Level: {RiskLevel}. Issues: {Issues}",
+                    e.PluginPath, e.PluginFolder, e.ValidationResult.RiskLevel, string.Join(", ", issues));
             }
             else if (e.ValidationResult.Warnings.Any())
             {
                 var warnings = e.ValidationResult.Warnings.Select(w => w.Description);
                 Log.Information(
-                    "Security validation warnings for plugin {FileName}: {Warnings}",
-                    e.FileName, string.Join(", ", warnings));
+                    "Security validation warnings for plugin {PluginPath}: {Warnings}",
+                    e.PluginPath, string.Join(", ", warnings));
             }
         }
 

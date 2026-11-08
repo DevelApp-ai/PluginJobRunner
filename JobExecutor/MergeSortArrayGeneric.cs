@@ -31,7 +31,7 @@ namespace JobExecutor
         /// <summary>
         /// Plugin version
         /// </summary>
-        public SemanticVersionNumber Version => SemanticVersionNumber.Parse("1.0.0");
+        public SemanticVersionNumber Version => new SemanticVersionNumber(1, 0, 0);
 
         /// <summary>
         /// Executes the merge sort job with type-safe input and output
