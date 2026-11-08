@@ -13,6 +13,7 @@ jobs:
       contents: read
       pull-requests: write
       actions: read
+      packages: read
 
     steps:
     - name: Checkout code
@@ -23,6 +24,11 @@ jobs:
       with:
         dotnet-version: '9.0.x'
         
+    # DevelApp.RuntimePluggableClassFactory >= 2.1.1 is published to the org's GitHub
+    # Packages feed (not NuGet.org); authenticate the feed so restore can resolve it.
+    - name: Configure GitHub Packages feed
+      run: dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github-packages https://nuget.pkg.github.com/DevelApp-ai/index.json
+
     - name: Restore dependencies
       run: set -o pipefail; dotnet restore 2>&1 | tee restore.log
       

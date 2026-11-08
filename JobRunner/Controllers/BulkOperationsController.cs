@@ -610,14 +610,4 @@ namespace JobRunner.Controllers
         public List<PluginInfo> Plugins { get; set; } = new List<PluginInfo>();
     }
 
-    /// <summary>
-    /// Plugin information
-    /// </summary>
-    public class PluginInfo
-    {
-        public string? Module { get; set; }
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public List<string>? Versions { get; set; }
-    }
 }

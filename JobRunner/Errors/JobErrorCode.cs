@@ -324,8 +324,8 @@ namespace JobRunner.Errors
                 Message = message ?? code.ToString(),
                 Exception = exception,
                 CorrelationId = correlationId,
-                IsRetryable = IsRetryable(code),
-                IsTransient = IsTransient(code)
+                IsRetryable = IsRetryableCode(code),
+                IsTransient = IsTransientCode(code)
             };
         }
 
@@ -353,7 +353,7 @@ namespace JobRunner.Errors
         /// </summary>
         /// <param name="code">Error code</param>
         /// <returns>True if retryable</returns>
-        public static bool IsRetryable(JobErrorCode code)
+        public static bool IsRetryableCode(JobErrorCode code)
         {
             return code switch
             {
@@ -374,7 +374,7 @@ namespace JobRunner.Errors
         /// </summary>
         /// <param name="code">Error code</param>
         /// <returns>True if transient</returns>
-        public static bool IsTransient(JobErrorCode code)
+        public static bool IsTransientCode(JobErrorCode code)
         {
             return code switch
             {
