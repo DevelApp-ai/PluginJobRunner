@@ -3,6 +3,7 @@ using DevelApp.RuntimePluggableClassFactory.FilePlugin;
 using DevelApp.Utility.Model;
 using JobRunner.Exceptions;
 using PluginInterface;
+using System.IO;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,16 @@ namespace JobRunner.JobExecutionFactory
         {
             try
             {
+                // RPCF 2.1.x's FilePluginLoader no longer throws for a missing
+                // plugin directory (it tolerates it and simply loads nothing),
+                // which silently ignored misconfiguration. Fail fast instead,
+                // matching the documented constructor contract.
+                if (!Directory.Exists(pluginPathUri.LocalPath))
+                {
+                    throw new DirectoryNotFoundException(
+                        $"Plugin directory does not exist: {pluginPathUri.LocalPath}");
+                }
+
                 // Create plugin loader with default security validator (filters unsafe plugins)
                 _pluginLoader = new FilePluginLoader<IJobExecutor>(pluginPathUri);
                 
