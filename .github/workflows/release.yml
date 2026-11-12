@@ -115,13 +115,23 @@ jobs:
         # Self-contained JobRunner binaries; the JobExecutor plugin
         # assemblies are published into Plugins/ next to the host so the
         # FilePluginLoader finds them (PluginDirectory: Plugins).
-        dotnet publish JobRunner/JobRunner.csproj --configuration Release --no-restore --self-contained -r win-x64 -o ./publish/win-x64
-        dotnet publish JobExecutor/JobExecutor.csproj --configuration Release --no-restore -o ./publish/win-x64/Plugins
-        dotnet publish JobRunner/JobRunner.csproj --configuration Release --no-restore --self-contained -r linux-x64 -o ./publish/linux-x64
-        dotnet publish JobExecutor/JobExecutor.csproj --configuration Release --no-restore -o ./publish/linux-x64/Plugins
-        # Framework-dependent layout for the GHCR container image
-        dotnet publish JobRunner/JobRunner.csproj --configuration Release --no-restore -o ./publish/container
-        dotnet publish JobExecutor/JobExecutor.csproj --configuration Release --no-restore -o ./publish/container/Plugins
+        # NOTE: the self-contained publishes must NOT pass --no-restore:
+        # the solution-level restore produced RID-less assets
+        # (net9.0 only), so a publish with -r win-x64/linux-x64 would
+        # fail with NETSDK1047 (no 'net9.0/win-x64' target in
+        # project.assets.json). Without --no-restore, dotnet publish
+        # runs a RID-aware restore for the given -r itself.
+        # /p:Version keeps the GitVersion semver in the published
+        # binaries (publish without --no-build rebuilds, and would
+        # otherwise fall back to the csproj's static Version).
+        dotnet publish JobRunner/JobRunner.csproj --configuration Release --self-contained -r win-x64 -o ./publish/win-x64 /p:Version=${{ steps.version.outputs.semver }}
+        dotnet publish JobExecutor/JobExecutor.csproj --configuration Release -o ./publish/win-x64/Plugins /p:Version=${{ steps.version.outputs.semver }}
+        dotnet publish JobRunner/JobRunner.csproj --configuration Release --self-contained -r linux-x64 -o ./publish/linux-x64 /p:Version=${{ steps.version.outputs.semver }}
+        dotnet publish JobExecutor/JobExecutor.csproj --configuration Release -o ./publish/linux-x64/Plugins /p:Version=${{ steps.version.outputs.semver }}
+        # Framework-dependent, RID-less layout for the GHCR container
+        # image (restored targets already cover this)
+        dotnet publish JobRunner/JobRunner.csproj --configuration Release -o ./publish/container /p:Version=${{ steps.version.outputs.semver }}
+        dotnet publish JobExecutor/JobExecutor.csproj --configuration Release -o ./publish/container/Plugins /p:Version=${{ steps.version.outputs.semver }}
         cd publish
         zip -rq ../JobRunner-v${{ steps.version.outputs.semver }}-win-x64.zip win-x64
         tar -czf ../JobRunner-v${{ steps.version.outputs.semver }}-linux-x64.tar.gz linux-x64
