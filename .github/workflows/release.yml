@@ -252,7 +252,13 @@ jobs:
     if: ${{ !cancelled() && needs.build.result == 'success' && github.event_name == 'push' && (needs.sign.result == 'success' || needs.sign.result == 'skipped') }}
     runs-on: ubuntu-latest
     permissions:
+      # NOTE: a job-level permissions block REPLACES the workflow-level
+      # permissions entirely - it does not merge with them. The first
+      # release run (43257579449) failed at 'Publish to GitHub Packages'
+      # with 401 because this block, added for the NuGet.org OIDC login,
+      # silently dropped the workflow-level 'packages: write'.
       contents: write
+      packages: write # GitHub Packages push with GITHUB_TOKEN
       id-token: write # OIDC token issuance for NuGet trusted publishing
     steps:
     - name: Download signed artifacts
