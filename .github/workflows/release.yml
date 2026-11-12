@@ -18,8 +18,11 @@ name: Release Pipeline
 #   PR-triggered builds skip signing so no TOTP window is spent on PRs.
 # - Publish order: GitHub Packages (all versions) -> GitHub Release
 #   (packages + self-contained JobRunner binaries) -> NuGet.org (stable
-#   only, NUGET_API_KEY). A NuGet.org failure can never block the org
-#   feed or the tagged release, but fails the job visibly.
+#   only). NuGet.org uses TRUSTED PUBLISHING (keyless, org standard): the
+#   publish job exchanges its GitHub OIDC token for a 1-hour nuget.org API
+#   key via NuGet/login@v1 - no NUGET_API_KEY secret anywhere. A NuGet.org
+#   failure can never block the org feed or the tagged release, but fails
+#   the job visibly.
 # - JobRunner is an ASP.NET Core executable (Web SDK, never packed): it
 #   ships as self-contained binaries on the GitHub Release and as a
 #   container image on GHCR (ghcr.io/develapp-ai/pluginjobrunner), built
@@ -238,6 +241,9 @@ jobs:
     needs: [build, sign]
     if: ${{ !cancelled() && needs.build.result == 'success' && github.event_name == 'push' && (needs.sign.result == 'success' || needs.sign.result == 'skipped') }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write # OIDC token issuance for NuGet trusted publishing
     steps:
     - name: Download signed artifacts
       if: needs.sign.result == 'success'
@@ -297,14 +303,34 @@ jobs:
           ./artifacts/*.nupkg
           ./binaries/*
 
+    - name: NuGet login (OIDC -> temp API key)
+      # Trusted publishing (org standard, no long-lived NUGET_API_KEY):
+      # this job's GitHub OIDC token is exchanged for a 1-hour nuget.org
+      # API key, validated against the trusted publishing policy
+      # registered on nuget.org for this repository + workflow:
+      #   Repository Owner: DevelApp-ai
+      #   Repository:      PluginJobRunner
+      #   Workflow File:   release.yml
+      #   Environment:     (none - the publish job uses no environment)
+      # NUGET_USER = the nuget.org profile name of the policy owner
+      # account (NOT an email address). The login must run close to the
+      # push (the temp key is valid for 1 hour); the first successful
+      # login activates the policy permanently (7-day window, else
+      # re-activate from the nuget.org Trusted Publishing page).
+      id: nuget-login
+      if: github.event_name == 'push' && needs.build.outputs.isprerelease == 'false'
+      uses: NuGet/login@v1
+      with:
+        user: ${{ secrets.NUGET_USER }}
+
     - name: Publish to NuGet.org
-      # Only stable (non-prerelease) versions are published to NuGet.org.
+      # Only stable (non-prerelease) versions are published to NuGet.org,
+      # with the keyless trusted-publishing key from the login step above.
       # Last step on purpose: a failure here must never block GitHub
       # Packages publishing or the tagged release (both already done),
-      # but it FAILS THE JOB visibly — no continue-on-error (the silent
-      # swallow is what hid missing NUGET_API_KEY elsewhere in the org).
+      # but it FAILS THE JOB visibly — no continue-on-error.
       if: github.event_name == 'push' && needs.build.outputs.isprerelease == 'false'
-      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
   publish-container:
     # JobRunner container image on GHCR (org container home precedent:
