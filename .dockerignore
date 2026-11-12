@@ -1,0 +1,7 @@
+.git
+.github
+**/bin
+**/obj
+**/log
+publish/win-x64
+publish/linux-x64
