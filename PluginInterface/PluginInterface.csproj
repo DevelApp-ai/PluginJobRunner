@@ -2,10 +2,36 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
+    <PackageId>DevelApp.PluginJobRunner.Interface</PackageId>
+    <Authors>Lars Shakya Buch-Jepsen</Authors>
+    <Company>DevelApp.ai ApS</Company>
+    <Product>PluginJobRunner.Interface</Product>
+    <Description>Job executor contract for PluginJobRunner: IJobExecutor, IJobExecutionContext and typed result types for building RuntimePluggableClassFactory-based job plugins.</Description>
+    <PackageTags>plugin;job;executor;quartz;scheduler;runtimepluggableclassfactory;sample</PackageTags>
+    <RepositoryUrl>https://github.com/DevelApp-ai/PluginJobRunner</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/DevelApp-ai/PluginJobRunner</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright © DevelApp.ai ApS 2026</Copyright>
+    <Version>1.0.0</Version>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="DevelApp.RuntimePluggableClassFactory.Interface" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

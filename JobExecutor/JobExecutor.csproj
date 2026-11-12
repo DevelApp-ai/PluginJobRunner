@@ -2,11 +2,37 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
+    <PackageId>DevelApp.PluginJobRunner.Executors</PackageId>
+    <Authors>Lars Shakya Buch-Jepsen</Authors>
+    <Company>DevelApp.ai ApS</Company>
+    <Product>PluginJobRunner.Executors</Product>
+    <Description>Sample job executor plugins for PluginJobRunner (MergeSortArray), demonstrating the IJobExecutor contract on RuntimePluggableClassFactory.</Description>
+    <PackageTags>plugin;job;executor;merge-sort;sample;runtimepluggableclassfactory</PackageTags>
+    <RepositoryUrl>https://github.com/DevelApp-ai/PluginJobRunner</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/DevelApp-ai/PluginJobRunner</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright © DevelApp.ai ApS 2026</Copyright>
+    <Version>1.0.0</Version>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\JobExecutorModel\JobExecutorModel.csproj" />
     <ProjectReference Include="..\PluginInterface\PluginInterface.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

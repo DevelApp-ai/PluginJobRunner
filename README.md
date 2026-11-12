@@ -40,6 +40,23 @@ To use the Api from the OpenApi UI you need to authorize using the green button 
 Migrations are created with ```dotnet ef migrations add InitialCreate -s ../JobRunner -o data -v``` in the JobExecutorModel project
 Migrations are done with ```dotnet ef database update -s ../JobRunner``` in the JobExecutorModel project
 
+## Packaging and releases
+The solution ships as both NuGet packages and an executable:
+
+- DevelApp.PluginJobRunner.Interface (PluginInterface) - the IJobExecutor contract that job plugin projects implement
+- DevelApp.PluginJobRunner.Model (JobExecutorModel) - the EF Core job model and JobDbContext
+- DevelApp.PluginJobRunner.Executors (JobExecutor) - the sample MergeSortArray executor plugin
+
+Publishing follows the org-standard pipeline (see RuntimePluggableClassFactory). Every push to main packs and signs the packages (Certum cloud code signing) and publishes them to the GitHub Packages feed; stable versions are also published to NuGet.org. The JobRunner itself is an ASP.NET Core web app and is not packed; each GitHub Release also carries self-contained JobRunner binaries (win-x64 zip and linux-x64 tar.gz, with the sample plugins pre-deployed into Plugins) and a container image is pushed to ghcr.io/develapp-ai/pluginjobrunner.
+
+Consuming the packages from the org feed requires authentication with a GitHub PAT with read:packages:
+
+    dotnet nuget add source --username <github-user> --password <token> --store-password-in-clear-text --name github-packages https://nuget.pkg.github.com/DevelApp-ai/index.json
+
+Running the container needs the database connection string:
+
+    docker run -e "ConnectionStrings__JobDatabase=Server=...;Database=JobDatabase;..." -p 8080:8080 ghcr.io/develapp-ai/pluginjobrunner:latest
+
 ## Defects and todos
 * Use of JsonschemaBuilder for validating input data for job and providing typed support for both input and output. JsonSchemaBuilder might need an upgrade
 * ApiKey is read from configuration file
