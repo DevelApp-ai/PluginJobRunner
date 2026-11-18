@@ -1,0 +1,37 @@
+# Declared dynamic-destination placeholder policies per package (SBOB-Forge
+# #49, org decision #39 — profiles are honest, never repaired).
+#
+# Tab-separated, one policy per line:
+#   <PkgDir>	<kind>	<id>	<match>	<emit>
+#
+#   kind  = net  -> a Connect candidate whose URL argument is the identifier
+#                   <match> lifts to a tier-P egress entry emitting <emit>
+#                   (SBOB-Forge netPolicies; variable-identity matching —
+#                   declaration alone lifts nothing, an undeclared dynamic
+#                   destination still fail-closes).
+#   kind  = path -> an Open candidate whose path argument is the identifier
+#                   <match> lifts to a tier-P open entry emitting <emit>
+#                   (sbobforge pathPolicies with an id).
+#
+#   emit = "⋯" (net)  : the declared any-peer destination — materializes as
+#                       the spec 5.7 any-peer entry (ipAddresses: ["*"]).
+#   emit = "/*" (path) : the declared any-path location — an absolute path
+#                       with a `*` tail (spec 5.1: one or more remaining
+#                       segments).
+#
+# The file is committed and reviewed like code (same contract as
+# deferred-plugins.txt): it is the single source of truth for fleet policies
+# — configs are derived from it and the csprojs, never hand-edited (#26).
+# The coverage report keeps one row per lifted candidate, tier P with the
+# policy id as its rule, so every wildcard in a profile answers WHY it is
+# there.
+#
+# Currently EMPTY: no PluginJobRunner package declares dynamic destinations —
+# the plugin packages are pure in-memory transformers (MergeSortArray /
+# MergeSortArrayGeneric sort in memory; the contract types declare no
+# behavior). Every dynamic-open candidate in the shared test project belongs
+# to the HOST's JobExecutorFactory tests (Path.Combine(Path.GetTempPath(), ...)
+# RPCF plugin loading), which the generator's namespace-attribution rule
+# keeps OUT of the package corpora.
+# Evidence: DevelApp-Repo-Global #54; feature: SBOB-Forge #49 (landed as
+# PR #50, pinned in the lane's forge ref).

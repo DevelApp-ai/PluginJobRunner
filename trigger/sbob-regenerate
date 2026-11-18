@@ -1,0 +1,14 @@
+Agent/human lane: pushing any change to this file on main requests a full
+profile regeneration run (.github/workflows/sbob-regenerate.yml). The run
+re-derives the sbobforge/ configs from the plugin csprojs, regenerates every
+committed profile (grammar lock frozen), and opens a PR with the result.
+Do not hand-edit profiles or configs — re-run the lane instead (org
+decision #26).
+
+Lane revision: 1 (2026-11-18, initial wiring — SBOB-Forge pinned at 64ee36ad;
+fleet = DevelApp.PluginJobRunner.Executors + DevelApp.PluginJobRunner.Interface;
+DevelApp.PluginJobRunner.Model is a corpus-skip (no tests reference it — a
+warning-skip, not a deferral); the JobRunner host (Web SDK) is not a package
+and is never profiled; NU1603 restore tolerance carried over from the
+Golem-lane lesson (Golem issue #223) until PACKAGES_READ_TOKEN lands;
+DevelApp-Repo-Global #54).
