@@ -1,0 +1,13 @@
+{
+  "packageType": "nuget",
+  "packageName": "DevelApp.PluginJobRunner.Executors",
+  "packageVersion": "1.0.0",
+  "namespace": "develapp",
+  "targetOs": "linux",
+  "architectures": [ "amd64" ],
+  "sutGlobs": [ "JobExecutor/**/*.cs" ],
+  "testGlobs": [ "JobExecutorTest/MergeSortArrayTest.cs" ],
+  "pathPolicies": [],
+  "execPathPolicy": {},
+  "allowParseError": []
+}
