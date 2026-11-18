@@ -110,7 +110,7 @@ if [ -f "$POLICY_FILE" ]; then
           exit 1 ;;
       esac
     fi
-    P_KIND+=("$p_pkg:$kind")
+    P_KIND+=("$p_pkg:$p_kind")
     P_ID+=("$p_pkg:$p_id")
     P_MATCH+=("$p_pkg:$p_match")
     P_EMIT+=("$p_pkg:$p_emit")
