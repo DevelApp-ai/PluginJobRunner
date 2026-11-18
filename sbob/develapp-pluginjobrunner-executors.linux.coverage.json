@@ -1,0 +1,401 @@
+{
+  "SbobIrVersion": 1,
+  "BehaviorHash": "b08b30a25f9b406dba9803d2407c1400009a8a1d4b799a186dfbd24d64de867d",
+  "FilesAnalyzed": 3,
+  "TestFiles": 1,
+  "TestEntries": 10,
+  "Quarantined": [],
+  "Noise": [
+    {
+      "Description": "harness API: .MergeSortArray",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 19,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.MergeSortArray_Start_True"
+    },
+    {
+      "Description": "harness API: Should.BeTrue",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 25,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.MergeSortArray_Start_True"
+    },
+    {
+      "Description": "harness API: starts.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 25,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.MergeSortArray_Start_True"
+    },
+    {
+      "Description": "harness API: Should.BeTrue",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 41,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_EmptyArray_True"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 41,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_EmptyArray_True"
+    },
+    {
+      "Description": "harness API: HaveLength.BeEquivalentTo",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 42,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_EmptyArray_True"
+    },
+    {
+      "Description": "harness API: NotBeNullOrWhiteSpace.HaveLength",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 42,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_EmptyArray_True"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 42,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_EmptyArray_True"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 42,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_EmptyArray_True"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 43,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_EmptyArray_True"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 43,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_EmptyArray_True"
+    },
+    {
+      "Description": "harness API: Should.BeFalse",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 53,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_MissingJobData_False"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 53,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_MissingJobData_False"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 54,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_MissingJobData_False"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 54,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_MissingJobData_False"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 55,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_MissingJobData_False"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 55,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_MissingJobData_False"
+    },
+    {
+      "Description": "harness API: Should.BeFalse",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 65,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayContainingNotNumbers_False"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 65,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayContainingNotNumbers_False"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 66,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayContainingNotNumbers_False"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 66,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayContainingNotNumbers_False"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 67,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayContainingNotNumbers_False"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 67,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayContainingNotNumbers_False"
+    },
+    {
+      "Description": "harness API: Should.BeFalse",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 77,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_JsonButNotArray_False"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 77,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_JsonButNotArray_False"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 78,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_JsonButNotArray_False"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 78,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_JsonButNotArray_False"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 79,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_JsonButNotArray_False"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 79,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_JsonButNotArray_False"
+    },
+    {
+      "Description": "harness API: Should.BeTrue",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 89,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfOne_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 89,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfOne_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: HaveLength.BeEquivalentTo",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 90,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfOne_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: NotBeNullOrWhiteSpace.HaveLength",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 90,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfOne_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 90,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfOne_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 90,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfOne_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 91,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfOne_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 91,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfOne_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: Should.BeTrue",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 101,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfAlreadySortedValues_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 101,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfAlreadySortedValues_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: NotBeNullOrWhiteSpace.BeEquivalentTo",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 102,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfAlreadySortedValues_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 102,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfAlreadySortedValues_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 102,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfAlreadySortedValues_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 103,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfAlreadySortedValues_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 103,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayOfAlreadySortedValues_ArrayAsInput"
+    },
+    {
+      "Description": "harness API: Should.BeTrue",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 114,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayNormal_SortedArray"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 114,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayNormal_SortedArray"
+    },
+    {
+      "Description": "harness API: NotBeNullOrWhiteSpace.BeEquivalentTo",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 115,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayNormal_SortedArray"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 115,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayNormal_SortedArray"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 115,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayNormal_SortedArray"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 116,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayNormal_SortedArray"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 116,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayNormal_SortedArray"
+    },
+    {
+      "Description": "harness API: Should.BeTrue",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 127,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayWithDuplicates_SortedArrayWithDublicates"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 127,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayWithDuplicates_SortedArrayWithDublicates"
+    },
+    {
+      "Description": "harness API: NotBeNullOrWhiteSpace.BeEquivalentTo",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 128,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayWithDuplicates_SortedArrayWithDublicates"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 128,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayWithDuplicates_SortedArrayWithDublicates"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 128,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayWithDuplicates_SortedArrayWithDublicates"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 129,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayWithDuplicates_SortedArrayWithDublicates"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 129,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayWithDuplicates_SortedArrayWithDublicates"
+    },
+    {
+      "Description": "harness API: Should.BeTrue",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 141,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayLong_SortedArray"
+    },
+    {
+      "Description": "harness API: success.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 141,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayLong_SortedArray"
+    },
+    {
+      "Description": "harness API: NotBeNullOrWhiteSpace.BeEquivalentTo",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 142,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayLong_SortedArray"
+    },
+    {
+      "Description": "harness API: Should.NotBeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 142,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayLong_SortedArray"
+    },
+    {
+      "Description": "harness API: returnedJobData.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 142,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayLong_SortedArray"
+    },
+    {
+      "Description": "harness API: Should.BeNullOrWhiteSpace",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 143,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayLong_SortedArray"
+    },
+    {
+      "Description": "harness API: error.Should",
+      "File": "JobExecutorTest/MergeSortArrayTest.cs",
+      "Line": 143,
+      "TestId": "JobExecutorTest.MergeSortArrayTest.ExecuteJob_ArrayLong_SortedArray"
+    }
+  ],
+  "Unrepresentable": []
+}
