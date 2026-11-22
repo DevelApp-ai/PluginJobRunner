@@ -106,17 +106,16 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
         run: |
           set -o pipefail
-          # Golem-lane lesson (Golem issue #223, run 44016481707): the pinned
-          # DevelApp.Minotaur 1.5.25 depends on DevelApp.StepParser/StepLexer
-          # >= 1.55.0, which exists only on the org GitHub Packages feed; NuGet
-          # can then resolve the public nuget.org 1.61.0 as an approximate best
-          # match and the forge's TreatWarningsAsErrors turns NU1603 into a
-          # restore error. This repo's ci.yml adds the org feed with the
-          # GITHUB_TOKEN, so the feed is readable — the tolerance is belt and
-          # braces until the durable fix (PACKAGES_READ_TOKEN repo/org secret
-          # or package sharing) lands; the Minotaur pin (and the grammar lock's
-          # recorded substrate version) is untouched.
-          dotnet restore -p:NoWarn=NU1603 2>&1 | tee restore.log
+          # Restore reads the org GitHub Packages feed through the
+          # PACKAGES_READ_TOKEN org secret (live since 2026-11-22, Lars;
+          # NUGET_AUTH_TOKEN falls back to GITHUB_TOKEN only if the secret
+          # disappears). The exact org-feed-only StepParser/StepLexer
+          # versions now resolve, so the NU1603 tolerance added for
+          # Golem issue #223 is dropped: a package-visibility regression
+          # fails the restore loudly (TreatWarningsAsErrors) instead of
+          # silently floating the transitive parser/lexer to the public
+          # nuget.org best match.
+          dotnet restore 2>&1 | tee restore.log
           dotnet build --no-restore -warnaserror 2>&1 | tee build.log
 
       - name: 'Derive the per-package configs from the csprojs (deterministic, #26)'
@@ -346,17 +345,16 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
         run: |
           set -o pipefail
-          # Golem-lane lesson (Golem issue #223, run 44016481707): the pinned
-          # DevelApp.Minotaur 1.5.25 depends on DevelApp.StepParser/StepLexer
-          # >= 1.55.0, which exists only on the org GitHub Packages feed; NuGet
-          # can then resolve the public nuget.org 1.61.0 as an approximate best
-          # match and the forge's TreatWarningsAsErrors turns NU1603 into a
-          # restore error. This repo's ci.yml adds the org feed with the
-          # GITHUB_TOKEN, so the feed is readable — the tolerance is belt and
-          # braces until the durable fix (PACKAGES_READ_TOKEN repo/org secret
-          # or package sharing) lands; the Minotaur pin (and the grammar lock's
-          # recorded substrate version) is untouched.
-          dotnet restore -p:NoWarn=NU1603 2>&1 | tee restore.log
+          # Restore reads the org GitHub Packages feed through the
+          # PACKAGES_READ_TOKEN org secret (live since 2026-11-22, Lars;
+          # NUGET_AUTH_TOKEN falls back to GITHUB_TOKEN only if the secret
+          # disappears). The exact org-feed-only StepParser/StepLexer
+          # versions now resolve, so the NU1603 tolerance added for
+          # Golem issue #223 is dropped: a package-visibility regression
+          # fails the restore loudly (TreatWarningsAsErrors) instead of
+          # silently floating the transitive parser/lexer to the public
+          # nuget.org best match.
+          dotnet restore 2>&1 | tee restore.log
           dotnet build --no-restore -warnaserror 2>&1 | tee build.log
 
       - name: 'Re-derive the configs and fail on tracked drift (untracked bootstrap files are fine)'
