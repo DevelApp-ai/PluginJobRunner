@@ -44,7 +44,31 @@ namespace JobExecutorModel.data
                     b.Property<int>("JobStatus")
                         .HasColumnType("int");
 
+                    b.Property<string>("CorrelationId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EmittedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("TriggerId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("TriggerExpression")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime?>("NextFireAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastOutcomeAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("JobId");
+
+                    b.HasIndex("CorrelationId");
 
                     b.ToTable("Job");
                 });

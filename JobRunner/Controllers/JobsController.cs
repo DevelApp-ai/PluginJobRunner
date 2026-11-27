@@ -6,6 +6,9 @@ using DevelApp.RuntimePluggableClassFactory.SemanticVersioning;
 using DevelApp.Utility.Model;
 using JobExecutorModel;
 using JobRunner.Errors;
+using JobRunner.JobExecutionFactory;
+using JobRunner.Telemetry;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -173,6 +176,11 @@ namespace JobRunner.Controllers
             Job job = new Job();
             job.JobExecutor = postJobRequest.JobExecutor;
             job.JobData = postJobRequest.JobData;
+            job.CorrelationId = string.IsNullOrEmpty(postJobRequest.CorrelationId)
+                ? JobExecutionContextFactory.NewCorrelationId()
+                : postJobRequest.CorrelationId;
+            job.EmittedBy = postJobRequest.EmittedBy;
+            job.TriggerId = postJobRequest.TriggerId;
 
             _context.Job.Add(job);
             await _context.SaveChangesAsync();
@@ -192,7 +200,14 @@ namespace JobRunner.Controllers
                     var executor = _jobExecutorFactory.GetInstance(moduleName, executorName);
                     if (executor != null)
                     {
-                        var result = executor.ExecuteJob(null, postJobRequest.JobData);
+                        var executionContext = JobExecutionContextFactory.CreateForJob(job);
+                        using var activity = JobTelemetry.StartJobActivity(
+                            executionContext.JobId,
+                            executionContext.CorrelationId,
+                            executionContext.JobExecutorName,
+                            executionContext.TriggerId,
+                            executionContext.EmittedBy);
+                        var result = executor.ExecuteJob(executionContext, postJobRequest.JobData);
                         jobResponse.Success = result.success;
                         jobResponse.JobExecutionMessage = result.success ? "Job executed successfully" : result.error;
                         jobResponse.ReturnedJobData = result.returnedJobData;
@@ -243,7 +258,14 @@ namespace JobRunner.Controllers
                     });
                 }
 
-                var result = executor.ExecuteJob(null, postJobRequest.JobData);
+                var executionContext = JobExecutionContextFactory.CreateForRequest(postJobRequest);
+                using var activity = JobTelemetry.StartJobActivity(
+                    executionContext.JobId,
+                    executionContext.CorrelationId,
+                    executionContext.JobExecutorName,
+                    executionContext.TriggerId,
+                    executionContext.EmittedBy);
+                var result = executor.ExecuteJob(executionContext, postJobRequest.JobData);
                 
                 var jobResponse = new JobResponse
                 {
@@ -298,7 +320,14 @@ namespace JobRunner.Controllers
                     });
                 }
 
-                var result = executor.ExecuteJob(null, postJobRequest.JobData);
+                var executionContext = JobExecutionContextFactory.CreateForRequest(postJobRequest);
+                using var activity = JobTelemetry.StartJobActivity(
+                    executionContext.JobId,
+                    executionContext.CorrelationId,
+                    executionContext.JobExecutorName,
+                    executionContext.TriggerId,
+                    executionContext.EmittedBy);
+                var result = executor.ExecuteJob(executionContext, postJobRequest.JobData);
                 
                 // Get cache statistics
                 var stats = _cachedJobExecutorFactory.GetCacheStatistics();
@@ -370,7 +399,14 @@ namespace JobRunner.Controllers
                     });
                 }
 
-                var result = executor.ExecuteJob(null, postJobRequest.JobData);
+                var executionContext = JobExecutionContextFactory.CreateForRequest(postJobRequest);
+                using var activity = JobTelemetry.StartJobActivity(
+                    executionContext.JobId,
+                    executionContext.CorrelationId,
+                    executionContext.JobExecutorName,
+                    executionContext.TriggerId,
+                    executionContext.EmittedBy);
+                var result = executor.ExecuteJob(executionContext, postJobRequest.JobData);
                 
                 var jobResponse = new JobResponse
                 {
