@@ -57,6 +57,14 @@ Running the container needs the database connection string:
 
     docker run -e "ConnectionStrings__JobDatabase=Server=...;Database=JobDatabase;..." -p 8080:8080 ghcr.io/develapp-ai/pluginjobrunner:latest
 
+## Shared substrate contract (decision DevelApp-Repo-Global #89)
+
+PJR carries the org-standard job execution contract shared by LaunchMobile-Platform and Taskhandler:
+
+* **IJobExecutionContext is now a concrete contract** (previously an empty stub): job id, correlation id (cross-host, also the OpenTelemetry trace attribute), plugin name, emitting host, trigger identity and expression, enqueue time, cancellation, host-provided properties, and a simple execution log. `JobExecutionContext` is the default implementation; hosts may provide their own.
+* **JobExecutorModel carries schedule/trigger metadata**: `CorrelationId` (indexed), `EmittedBy`, `TriggerId`, `TriggerExpression`, `NextFireAtUtc`, `LastOutcomeAtUtc` — additive nullable columns, one EF migration (`20261127120000_ScheduleMetadataAdded`). A portable job record is one Job row.
+* **Telemetry**: `JobRunner.Telemetry.JobTelemetry` exposes `System.Diagnostics.ActivitySource` "DevelApp.PluginJobRunner" and starts one activity per job execution with stable tag keys (`pjr.job.correlation_id` etc.). No OpenTelemetry package dependency; consumers register the OTel .NET SDK tracer with the source name.
+
 ## Defects and todos
 * Use of JsonschemaBuilder for validating input data for job and providing typed support for both input and output. JsonSchemaBuilder might need an upgrade
 * ApiKey is read from configuration file
