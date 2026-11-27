@@ -5,6 +5,9 @@ using DevelApp.RuntimePluggableClassFactory.SemanticVersioning;
 using DevelApp.Utility.Model;
 using JobExecutorModel;
 using JobRunner.Errors;
+using JobRunner.JobExecutionFactory;
+using JobRunner.Telemetry;
+
 using Microsoft.AspNetCore.Mvc;
 using PluginInterface;
 using System;
@@ -85,7 +88,14 @@ namespace JobRunner.Controllers
                             continue;
                         }
 
-                        var result = executor.ExecuteJob(null, jobRequest.JobData);
+                        var executionContext = JobExecutionContextFactory.CreateForRequest(jobRequest);
+                        using var activity = JobTelemetry.StartJobActivity(
+                            executionContext.JobId,
+                            executionContext.CorrelationId,
+                            executionContext.JobExecutorName,
+                            executionContext.TriggerId,
+                            executionContext.EmittedBy);
+                        var result = executor.ExecuteJob(executionContext, jobRequest.JobData);
                         
                         results.Add(new IndividualJobResult
                         {
@@ -178,7 +188,14 @@ namespace JobRunner.Controllers
                         var jobRequest = request.Jobs.FirstOrDefault(j => j.JobExecutor == kvp.Key.Name.ToString());
                         if (jobRequest != null)
                         {
-                            var result = kvp.Value.ExecuteJob(null, jobRequest.JobData);
+                            var executionContext = JobExecutionContextFactory.CreateForRequest(jobRequest);
+                            using var activity = JobTelemetry.StartJobActivity(
+                                executionContext.JobId,
+                                executionContext.CorrelationId,
+                                executionContext.JobExecutorName,
+                                executionContext.TriggerId,
+                                executionContext.EmittedBy);
+                            var result = kvp.Value.ExecuteJob(executionContext, jobRequest.JobData);
                             results.Add(new IndividualJobResult
                             {
                                 JobExecutor = jobRequest.JobExecutor,
@@ -428,6 +445,22 @@ namespace JobRunner.Controllers
         /// Job data (JSON string)
         /// </summary>
         public string? JobData { get; set; }
+
+        /// <summary>
+        /// Optional correlation id for cross-host tracing (decision #89).
+        /// When omitted the JobRunner assigns one.
+        /// </summary>
+        public string? CorrelationId { get; set; }
+
+        /// <summary>
+        /// Optional name of the emitting host (for portable job records)
+        /// </summary>
+        public string? EmittedBy { get; set; }
+
+        /// <summary>
+        /// Optional scheduler trigger identity when the job is trigger-driven
+        /// </summary>
+        public string? TriggerId { get; set; }
     }
 
     /// <summary>
